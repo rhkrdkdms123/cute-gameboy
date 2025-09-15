@@ -1,0 +1,122 @@
+/**
+ * @file hal.c
+ * @author aheun kwak (rhkrdkdms1234@gmail.com)
+ * @brief definitions for input/output functions and types
+ * @details This file contains definitions for input/output functions and types used in the retro game project
+ * @version 0.1
+ * @date 2025-09-15
+ * 
+ * @copyright Copyright (c) 2025
+ * 
+ */
+
+#if defined(PICO)
+#include "hal.h"
+#include "pico/stdlib.h"
+#include "hardware/pwm.h"
+#include "hardware/i2c.h"
+#include "ssd1306.h"
+
+#define UP 2
+#define DOWN 3
+#define LEFT 4
+#define RIGHT 5
+#define A 6
+#define B 7
+#define SPEAKER_PIN 15
+#define I2C_PORT i2c0
+#define I2C_SDA 8
+#define I2C_SCL 9
+#define OLED_ADDR 0x3C
+
+void io_init() {
+    int pins[] = {UP, DOWN, LEFT, RIGHT, A, B};
+    for(int i=0;i<6;i++){
+        gpio_init(pins[i]);
+        gpio_set_dir(pins[i], GPIO_IN);
+        gpio_pull_up(pins[i]);
+    }
+
+    // I2C OLED init
+    i2c_init(I2C_PORT, 400*1000);
+    gpio_set_function(I2C_SDA, GPIO_FUNC_I2C);
+    gpio_set_function(I2C_SCL, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C_SDA);
+    gpio_pull_up(I2C_SCL);
+    ssd1306_init(I2C_PORT, OLED_ADDR, 16, 8); // 16x8 LCD
+
+    // PWM speaker init
+    gpio_set_function(SPEAKER_PIN, GPIO_FUNC_PWM);
+    pwm_set_enabled(pwm_gpio_to_slice_num(SPEAKER_PIN), false);
+
+    lcd_clear();
+}
+
+Buttons read_buttons() {
+    Buttons btn;
+    btn.up    = !gpio_get(UP);
+    btn.down  = !gpio_get(DOWN);
+    btn.left  = !gpio_get(LEFT);
+    btn.right = !gpio_get(RIGHT);
+    btn.a     = !gpio_get(A);
+    btn.b     = !gpio_get(B);
+    return btn;
+}
+
+void lcd_clear() { ssd1306_clear(); }
+
+void lcd_draw(int x, int y, char c) { ssd1306_draw_pixel(x, y, 1); }
+
+void io_update(GameState state, int selected_game, int score) { ssd1306_refresh(); }
+
+void play_sound(int freq, int duration_ms) {
+    uint slice = pwm_gpio_to_slice_num(SPEAKER_PIN);
+    pwm_set_wrap(slice, 125000000/freq - 1);
+    pwm_set_chan_level(slice, PWM_CHAN_A, pwm_get_wrap(slice)/2);
+    pwm_set_enabled(slice, true);
+    sleep_ms(duration_ms);
+    pwm_set_enabled(slice, false);
+}
+#else
+ // Simulation mode: this part is ignored in actual hardware
+#include "hal.h"
+#include <stdio.h>
+#include <conio.h> // _kbhit, _getch
+#include <windows.h>
+
+void io_init() {
+    // Nothing to init for console
+}
+
+Buttons read_buttons() {
+    Buttons btn = {0};
+    if (_kbhit()) {
+        int c = _getch();
+        switch(c) {
+            case 'w': btn.up=1; break;
+            case 's': btn.down=1; break;
+            case 'a': btn.left=1; break;
+            case 'd': btn.right=1; break;
+            case 'j': btn.a=1; break;
+            case 'k': btn.b=1; break;
+        }
+    }
+    return btn;
+}
+
+void lcd_clear() {
+    system("cls");
+}
+
+void lcd_draw(int x, int y, char c) {
+    // Simple console: ignore drawing, will print grid in io_update
+}
+
+void io_update(GameState state, int selected_game, int score) {
+    printf("Score: %d\n", score);
+}
+
+void play_sound(int freq, int duration_ms) {
+    Beep(freq, duration_ms );
+}
+#endif
