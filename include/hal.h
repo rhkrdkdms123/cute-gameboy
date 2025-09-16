@@ -17,6 +17,13 @@
 #define LCD_WIDTH 16
 #define LCD_HEIGHT 8
 
+#define BUTTON_UP 'w'
+#define BUTTON_DOWN 's'
+#define BUTTON_LEFT 'a'
+#define BUTTON_RIGHT 'd'
+#define BUTTON_A 'j'
+#define BUTTON_B 'k'
+
 typedef struct {
     bool up, down, left, right;
     bool a, b;

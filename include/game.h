@@ -15,6 +15,14 @@
 
 #define MAX_OBSTACLES 12
 
-int menu_update(Buttons btn, int selected_game, GameState *state);
-int game_update(int selected_game, GameState *state, int score, Buttons btn, int *frame_count);
+typedef enum
+{
+    GAME_TYPE_A,
+    GAME_TYPE_B,
+    GAME_TYPE_C,
+    GAME_COUNT
+} GameType_t;
+
+GameType_t menu_update(Buttons btn, GameType_t selected_game, GameState *state);
+int game_update(GameType_t selected_game, GameState *state, int score, Buttons btn, int *frame_count);
 void score_screen_update(Buttons btn, int score, GameState *state);

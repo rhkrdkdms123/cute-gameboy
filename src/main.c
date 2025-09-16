@@ -28,7 +28,7 @@ int main() {
     io_init();
 
     GameState state = STATE_MENU;
-    int selected_game = 0;
+    GameType_t selected_game = 0;
     int score = 0;
     int frame_count = 0;
 

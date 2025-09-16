@@ -31,26 +31,37 @@ static int group_timer = 0;
 static int group_interval = 3;
 static int score_for_difficulty = 0;
 
-int menu_update(Buttons btn, int selected_game, GameState *state){
-    if(btn.up) selected_game = (selected_game + 1) % 3;
-    if(btn.down) selected_game = (selected_game + 2) % 3;
-    if(btn.a){
-        *state = STATE_PLAY;
-        play_sound(1000, 100);
+GameType_t menu_update(Buttons btn, GameType_t selected_game, GameState *state){
+    // Move selection up (decrease index, wrap around)
+    if(btn.up) selected_game = (selected_game + GAME_COUNT - 1) % GAME_COUNT;
 
+    // Move selection down (increase index)
+    if(btn.down) selected_game = (selected_game + 1) % GAME_COUNT;
+
+    // If 'A' button pressed → start game
+    if(btn.a){
+        *state = STATE_PLAY;            // Switch to play state
+        play_sound(1000, 100);          // Play confirm sound
+
+        /* 
+        // Reset player and obstacles
         player_x = LCD_WIDTH/2;
         for(int i=0;i<MAX_OBSTACLES;i++){
             obstacles[i].active = 0;
             obstacles[i].y = -1;
         }
+
+        // Reset difficulty
         group_timer = 0;
         group_interval = 3 + rand()%4;
         score_for_difficulty = 0;
+        */
     }
+
     return selected_game;
 }
 
-int game_update(int selected_game, GameState *state, int score, Buttons btn, int *frame_count){
+int game_update(GameType_t selected_game, GameState *state, int score, Buttons btn, int *frame_count){
     (*frame_count)++;
 
     // Dynamic difficulty

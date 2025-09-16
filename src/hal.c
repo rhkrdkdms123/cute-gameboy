@@ -84,6 +84,9 @@ void play_sound(int freq, int duration_ms) {
 #include <conio.h> // _kbhit, _getch
 #include <windows.h>
 
+// Virtual LCD buffer
+static char lcd_buffer[LCD_HEIGHT][LCD_WIDTH+1]; // +1 for null terminator
+
 void io_init() {
     // Nothing to init for console
 }
@@ -93,27 +96,45 @@ Buttons read_buttons() {
     if (_kbhit()) {
         int c = _getch();
         switch(c) {
-            case 'w': btn.up=1; break;
-            case 's': btn.down=1; break;
-            case 'a': btn.left=1; break;
-            case 'd': btn.right=1; break;
-            case 'j': btn.a=1; break;
-            case 'k': btn.b=1; break;
+            case BUTTON_UP: btn.up=1; break;
+            case BUTTON_DOWN: btn.down=1; break;
+            case BUTTON_LEFT: btn.left=1; break;
+            case BUTTON_RIGHT: btn.right=1; break;
+            case BUTTON_A: btn.a=1; break;
+            case BUTTON_B: btn.b=1; break;
         }
     }
     return btn;
 }
 
+
+// Clear LCD buffer and console
 void lcd_clear() {
-    system("cls");
+    for (int y = 0; y < LCD_HEIGHT; y++) {
+        for (int x = 0; x < LCD_WIDTH; x++) {
+            lcd_buffer[y][x] = ' ';  // empty space = off pixel
+        }
+        lcd_buffer[y][LCD_WIDTH] = '\0'; // end of string
+    }
+    system("cls"); // clear console
 }
 
+// Draw a character at position (x, y)
 void lcd_draw(int x, int y, char c) {
-    // Simple console: ignore drawing, will print grid in io_update
+    if (x >= 0 && x < LCD_WIDTH && y >= 0 && y < LCD_HEIGHT) {
+        lcd_buffer[y][x] = c;  // use given character
+    }
 }
 
+// Print buffer content to console
 void io_update(GameState state, int selected_game, int score) {
+    system("cls");  // clear console
     printf("Score: %d\n", score);
+    printf("----------------\n"); // separator line (16 chars)
+
+    for (int y = 0; y < LCD_HEIGHT; y++) {
+        printf("%s\n", lcd_buffer[y]);
+    }
 }
 
 void play_sound(int freq, int duration_ms) {
