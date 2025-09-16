@@ -17,12 +17,14 @@
 
 typedef enum
 {
-    GAME_TYPE_A,
-    GAME_TYPE_B,
+    GAME_TYPE_A,  // name: Pixel Rush
+    GAME_TYPE_B,  // name: ..
     GAME_TYPE_C,
     GAME_COUNT
 } GameType_t;
 
 GameType_t menu_update(Buttons btn, GameType_t selected_game, GameState *state);
+void init_game(GameType_t selected_game);
 int game_update(GameType_t selected_game, GameState *state, int score, Buttons btn, int *frame_count);
+int PixelRush_update(GameState *state, int score, Buttons btn, int *frame_count);
 void score_screen_update(Buttons btn, int score, GameState *state);
