@@ -12,6 +12,7 @@
 
 #include "hal.h"
 #include "game.h"
+#include "screen.h"
 #ifdef PICO
 // #include "pico/stdlib.h"
 #else
@@ -28,9 +29,14 @@ int main() {
     io_init();
 
     GameState state = STATE_MENU;
-    GameType_t selected_game = 0;
+    GameType_t selected_game = GAME_TYPE_A;
     int score = 0;
     int frame_count = 0;
+
+    /* demo world for streaming text on LCD */
+    GameWorld *gw = world_create(256, LCD_HEIGHT);
+    char colbuf[LCD_HEIGHT];
+    int demo_frame = 0;
 
     while(1) {
         Buttons btn = read_buttons();
@@ -47,6 +53,15 @@ int main() {
             case STATE_SCORE:
                 score_screen_update(btn, score, &state);
                 break;
+        }
+
+        /* Demo: stream columns when playing PixelRush */
+        if (state == STATE_PLAY && selected_game == GAME_TYPE_A) {
+            /* prepare column: one 'X' moving down */
+            for (int r = 0; r < gw->world_height; ++r) colbuf[r] = ' ';
+            colbuf[demo_frame % gw->world_height] = 'X';
+            world_stream_step(gw, colbuf);
+            demo_frame++;
         }
 
         io_update(state, selected_game, score);

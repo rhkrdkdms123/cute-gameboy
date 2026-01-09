@@ -128,6 +128,19 @@ void lcd_draw(int x, int y, char c) {
 
 // Print buffer content to console
 void io_update(GameState state, int selected_game, int score) {
+
+    switch(state) {
+        case STATE_MENU:
+            printf("MENU - Select Game: %d\n", selected_game);
+            break;
+        case STATE_PLAY:
+            printf("PLAY - Score: %d\n", score);
+            break;
+        case STATE_SCORE:
+            printf("SCORE SCREEN - Final Score: %d\n", score);
+            break;
+    }
+    /*
     system("cls");  // clear console
     printf("Score: %d\n", score);
     printf("----------------\n"); // separator line (16 chars)
@@ -135,6 +148,7 @@ void io_update(GameState state, int selected_game, int score) {
     for (int y = 0; y < LCD_HEIGHT; y++) {
         printf("%s\n", lcd_buffer[y]);
     }
+    */
 }
 
 void play_sound(int freq, int duration_ms) {

@@ -12,6 +12,7 @@
 
 #pragma once
 #include "hal.h"
+#include "config.h"
 
 #define MAX_OBSTACLES 12
 
@@ -22,6 +23,8 @@ typedef enum
     GAME_TYPE_C,
     GAME_COUNT
 } GameType_t;
+
+
 
 GameType_t menu_update(Buttons btn, GameType_t selected_game, GameState *state);
 void init_game(GameType_t selected_game);

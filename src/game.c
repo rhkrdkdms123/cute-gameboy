@@ -12,6 +12,8 @@
 #include "game.h"
 #include "hal.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 
 #define PLAYER_CHAR 'P'
 #define OBSTACLE_CHAR 'X'
@@ -36,12 +38,23 @@ GameType_t menu_update(Buttons btn, GameType_t selected_game, GameState *state)
 {
     // Move selection up (decrease index, wrap around)
     if (btn.up)
+    {
         selected_game = (selected_game + GAME_COUNT - 1) % GAME_COUNT;
+#ifdef DEBUG
+        printf("button up, Selected game: %d\n", selected_game);
+#endif
+    }
+        
 
     // Move selection down (increase index)
     if (btn.down)
+    {
         selected_game = (selected_game + 1) % GAME_COUNT;
-
+#ifdef DEBUG
+        printf("button down, Selected game: %d\n", selected_game);
+#endif
+    }
+        
     // If 'A' button pressed → start game
     if (btn.a)
     {
@@ -162,12 +175,14 @@ int PixelRush_update(GameState *state, int score, Buttons btn, int *frame_count)
         }
     }
 
+    /*
     // LCD update
     lcd_clear();
     lcd_draw(player_x, LCD_HEIGHT - 1, PLAYER_CHAR);
     for (int i = 0; i < MAX_OBSTACLES; i++)
         if (obstacles[i].active)
             lcd_draw(obstacles[i].x, obstacles[i].y, OBSTACLE_CHAR);
+    */
 
     return score;
 }

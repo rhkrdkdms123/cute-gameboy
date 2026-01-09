@@ -1,0 +1,2 @@
+// #define PICO
+#define DEBUG
